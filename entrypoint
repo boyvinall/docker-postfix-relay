@@ -90,12 +90,18 @@ if [ -n "$MAIL_NON_CANONICAL_DEFAULT" ]; then
     /usr/sbin/postmap /etc/postfix/sender_canonical_regexp
 fi
 
+for e in ${!POSTFIX_*} ; do
+    postconf -e "${e:8}=${!e}" ;
+done
+
 _log "Docker entrypoint configured"
 
 # Start syslog daemon
+/etc/init.d/rsyslog stop
+rm -f /var/run/rsyslogd.pid
 /etc/init.d/rsyslog start
 
 # Start Postfix daemon
 /etc/init.d/postfix start
 
-$@ & wait ${!}
+exec "$@"

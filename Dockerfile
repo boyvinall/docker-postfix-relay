@@ -29,6 +29,7 @@ RUN apt-get update && \
 
 ADD postfix /etc/postfix
 ADD entrypoint sendmail_test /usr/local/bin/
+ADD dumb-init /usr/local/bin/dumb-init
 
 RUN chmod a+rx /usr/local/bin/* && \
     /usr/sbin/postconf -e smtp_tls_security_level=may && \
@@ -49,5 +50,5 @@ RUN chmod a+rx /usr/local/bin/* && \
     /usr/sbin/postmap /etc/postfix/virtual && \
     /usr/sbin/postmap /etc/postfix/sender_canonical_regexp
 
-ENTRYPOINT ["/usr/local/bin/entrypoint"]
+ENTRYPOINT ["/usr/local/bin/dumb-init","-t","/usr/local/bin/entrypoint"]
 CMD ["tail", "-f", "/var/log/mail.log"]
